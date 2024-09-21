@@ -34,3 +34,5 @@ module.exports = {
   },
   plugins: [],
 };
+//if you have issues with this config
+//typescript 3.3.2 works well, try it out!!!
