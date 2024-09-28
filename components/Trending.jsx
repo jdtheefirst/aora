@@ -6,9 +6,13 @@ import {
   Image,
   ImageBackground,
   TouchableOpacity,
+  View,
+  Button,
+  Alert,
 } from "react-native";
 
 import { icons } from "../constants";
+import { addBookmark } from "../lib/appwrite"; // Assuming the addBookmark function is already set up
 
 const zoomIn = {
   0: {
@@ -28,8 +32,18 @@ const zoomOut = {
   },
 };
 
-const TrendingItem = ({ activeItem, item }) => {
+const TrendingItem = ({ activeItem, item, userId }) => {
   const [play, setPlay] = useState(false);
+
+  const handleAddBookmark = async (videoId) => {
+    try {
+      await addBookmark(userId, videoId);
+      Alert.alert("Success", "Bookmark added successfully!");
+    } catch (error) {
+      console.error(error.message);
+      Alert.alert("Error", "Failed to add bookmark.");
+    }
+  };
 
   return (
     <Animatable.View
@@ -71,11 +85,19 @@ const TrendingItem = ({ activeItem, item }) => {
           />
         </TouchableOpacity>
       )}
+
+      {/* Bookmark Button */}
+      <View className="mt-3">
+        <Button
+          title="Bookmark"
+          onPress={() => handleAddBookmark(item.$id)} // Pass video ID to the function
+        />
+      </View>
     </Animatable.View>
   );
 };
 
-const Trending = ({ posts }) => {
+const Trending = ({ posts, userId }) => {
   const [activeItem, setActiveItem] = useState(posts[0]);
 
   const viewableItemsChanged = ({ viewableItems }) => {
@@ -90,7 +112,7 @@ const Trending = ({ posts }) => {
       horizontal
       keyExtractor={(item) => item.$id}
       renderItem={({ item }) => (
-        <TrendingItem activeItem={activeItem} item={item} />
+        <TrendingItem activeItem={activeItem} item={item} userId={userId} />
       )}
       onViewableItemsChanged={viewableItemsChanged}
       viewabilityConfig={{

@@ -1,13 +1,13 @@
 import { useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, Button, Alert } from "react-native-safe-area-context";
 import { FlatList, Image, RefreshControl, Text, View } from "react-native";
 
 import { images } from "../../constants";
 import useAppwrite from "../../lib/useAppwrite";
-import { getAllPosts, getLatestPosts } from "../../lib/appwrite";
+import { getAllPosts, getLatestPosts, addBookmark } from "../../lib/appwrite";
 import { EmptyState, SearchInput, Trending, VideoCard } from "../../components";
 
-const Home = () => {
+const Home = ({ userId }) => {
   const { data: posts, refetch } = useAppwrite(getAllPosts);
   const { data: latestPosts } = useAppwrite(getLatestPosts);
 
@@ -19,11 +19,15 @@ const Home = () => {
     setRefreshing(false);
   };
 
-  // one flatlist
-  // with list header
-  // and horizontal flatlist
-
-  //  we cannot do that with just scrollview as there's both horizontal and vertical scroll (two flat lists, within trending)
+  const handleAddBookmark = async (videoId) => {
+    try {
+      await addBookmark(userId, videoId);
+      Alert.alert("Success", "Bookmark added successfully!");
+    } catch (error) {
+      console.error(error.message);
+      Alert.alert("Error", "Failed to add bookmark.");
+    }
+  };
 
   return (
     <SafeAreaView className="bg-primary">
@@ -31,13 +35,20 @@ const Home = () => {
         data={posts}
         keyExtractor={(item) => item.$id}
         renderItem={({ item }) => (
-          <VideoCard
-            title={item.title}
-            thumbnail={item.thumbnail}
-            video={item.video}
-            creator={item.creator.username}
-            avatar={item.creator.avatar}
-          />
+          <View className="my-4">
+            <VideoCard
+              title={item.title}
+              thumbnail={item.thumbnail}
+              video={item.video}
+              creator={item.creator.username}
+              avatar={item.creator.avatar}
+            />
+            {/* Bookmark Button */}
+            <Button
+              title="Bookmark"
+              onPress={() => handleAddBookmark(item.$id)} // Pass video ID to handleAddBookmark
+            />
+          </View>
         )}
         ListHeaderComponent={() => (
           <View className="flex my-6 px-4 space-y-6">

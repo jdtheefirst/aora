@@ -14,14 +14,15 @@
     "scheme": "sora",
     "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "package": "com.intimates_plus.aora"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.jsm.sora"
+      "package": "com.intimates_plus.aora"
     },
     "web": {
       "favicon": "./assets/favicon.png"
