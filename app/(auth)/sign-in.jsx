@@ -1,11 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { View, Text, ScrollView, Dimensions, Alert, Image } from "react-native";
 
 import { images } from "../../constants";
 import { CustomButton, FormField } from "../../components";
-import { getCurrentUser, signIn } from "../../lib/appwrite";
+import {
+  checkActiveSession,
+  deleteSessions,
+  getCurrentUser,
+  signIn,
+} from "../../lib/appwrite";
 import { useGlobalContext } from "../../context/GlobalProvider";
 
 const SignIn = () => {
@@ -19,18 +24,31 @@ const SignIn = () => {
   const submit = async () => {
     if (form.email === "" || form.password === "") {
       Alert.alert("Error", "Please fill in all fields");
+      return;
     }
 
     setSubmitting(true);
 
     try {
-      await signIn(form.email, form.password);
-      const result = await getCurrentUser();
-      setUser(result);
-      setIsLogged(true);
+      const activeSession = await checkActiveSession();
+      if (activeSession) {
+        await deleteSessions(); // Remove active session if it exists
+      }
 
-      Alert.alert("Success", "User signed in successfully");
-      router.replace("/home");
+      // Sign in the user
+      await signIn(form.email, form.password);
+
+      // Fetch the current user and update global state
+      const result = await getCurrentUser();
+
+      if (result) {
+        setUser(result);
+        setIsLogged(true);
+        Alert.alert("Success", "User signed in successfully");
+
+        // Redirect only after the user is set
+        router.replace("/home");
+      }
     } catch (error) {
       Alert.alert("Error", error.message);
     } finally {

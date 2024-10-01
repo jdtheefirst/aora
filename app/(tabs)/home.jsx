@@ -1,15 +1,26 @@
 import { useState } from "react";
-import { SafeAreaView, Button, Alert } from "react-native-safe-area-context";
-import { FlatList, Image, RefreshControl, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  FlatList,
+  Image,
+  RefreshControl,
+  Text,
+  View,
+  Alert,
+} from "react-native";
 
 import { images } from "../../constants";
 import useAppwrite from "../../lib/useAppwrite";
-import { getAllPosts, getLatestPosts, addBookmark } from "../../lib/appwrite";
+import { getAllPosts, getLatestPosts } from "../../lib/appwrite";
 import { EmptyState, SearchInput, Trending, VideoCard } from "../../components";
+import { useGlobalContext } from "../../context/GlobalProvider";
+import Icon from "react-native-vector-icons/FontAwesome";
+import { TouchableOpacity } from "react-native";
 
-const Home = ({ userId }) => {
+const Home = () => {
   const { data: posts, refetch } = useAppwrite(getAllPosts);
   const { data: latestPosts } = useAppwrite(getLatestPosts);
+  const { user } = useGlobalContext();
 
   const [refreshing, setRefreshing] = useState(false);
 
@@ -21,12 +32,16 @@ const Home = ({ userId }) => {
 
   const handleAddBookmark = async (videoId) => {
     try {
-      await addBookmark(userId, videoId);
+      await handleAddBookmark(user?.$id, videoId);
       Alert.alert("Success", "Bookmark added successfully!");
     } catch (error) {
       console.error(error.message);
       Alert.alert("Error", "Failed to add bookmark.");
     }
+  };
+
+  const isBookmarked = (video) => {
+    return video.bookmarks.includes(user?.$id);
   };
 
   return (
@@ -35,7 +50,7 @@ const Home = ({ userId }) => {
         data={posts}
         keyExtractor={(item) => item.$id}
         renderItem={({ item }) => (
-          <View className="my-4">
+          <View className="relative my-4">
             <VideoCard
               title={item.title}
               thumbnail={item.thumbnail}
@@ -43,11 +58,23 @@ const Home = ({ userId }) => {
               creator={item.creator.username}
               avatar={item.creator.avatar}
             />
-            {/* Bookmark Button */}
-            <Button
-              title="Bookmark"
-              onPress={() => handleAddBookmark(item.$id)} // Pass video ID to handleAddBookmark
-            />
+            <TouchableOpacity
+              style={{
+                position: "absolute",
+                bottom: 70, // Adjust as needed
+                right: 10, // Adjust as needed
+                backgroundColor: "white", // Optional: to give it a background
+                borderRadius: 20, // Optional: to make it round
+                padding: 10, // Optional: to add some space around the icon
+              }}
+              onPress={() => handleAddBookmark(item.$id)}
+            >
+              <Icon
+                name={isBookmarked(item) ? "check" : "plus"} // Use 'check' for tick, 'plus' for add
+                size={20} // Adjust size as needed
+                color={isBookmarked(item) ? "green" : "blue"} // Change color based on state
+              />
+            </TouchableOpacity>
           </View>
         )}
         ListHeaderComponent={() => (
@@ -57,9 +84,7 @@ const Home = ({ userId }) => {
                 <Text className="font-pmedium text-sm text-gray-100">
                   Welcome Back
                 </Text>
-                <Text className="text-2xl font-psemibold text-white">
-                  JSMastery
-                </Text>
+                <Text className="text-2xl font-psemibold text-white">Aora</Text>
               </View>
 
               <View className="mt-1.5">

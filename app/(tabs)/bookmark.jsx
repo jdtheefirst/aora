@@ -2,15 +2,18 @@ import { useState, useEffect } from "react";
 import { Text, FlatList, ActivityIndicator, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { getBookmarks } from "../../lib/appwrite"; // Import your function
+import { useGlobalContext } from "../../context/GlobalProvider";
 
-const Bookmark = ({ userId }) => {
+const Bookmark = () => {
   const [bookmarks, setBookmarks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useGlobalContext();
 
   useEffect(() => {
     async function fetchBookmarks() {
+      if (!user.$id) return; // Prevent fetching if userId is not available
       try {
-        const userBookmarks = await getBookmarks(userId);
+        const userBookmarks = await getBookmarks(user.$id);
         setBookmarks(userBookmarks);
       } catch (error) {
         console.error(error.message);
@@ -20,7 +23,7 @@ const Bookmark = ({ userId }) => {
     }
 
     fetchBookmarks();
-  }, [userId]);
+  }, [user.$id]);
 
   if (loading) {
     return <ActivityIndicator size="large" color="#00ff00" />;

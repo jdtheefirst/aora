@@ -32,18 +32,8 @@ const zoomOut = {
   },
 };
 
-const TrendingItem = ({ activeItem, item, userId }) => {
+const TrendingItem = ({ activeItem, item }) => {
   const [play, setPlay] = useState(false);
-
-  const handleAddBookmark = async (videoId) => {
-    try {
-      await addBookmark(userId, videoId);
-      Alert.alert("Success", "Bookmark added successfully!");
-    } catch (error) {
-      console.error(error.message);
-      Alert.alert("Error", "Failed to add bookmark.");
-    }
-  };
 
   return (
     <Animatable.View
@@ -85,14 +75,6 @@ const TrendingItem = ({ activeItem, item, userId }) => {
           />
         </TouchableOpacity>
       )}
-
-      {/* Bookmark Button */}
-      <View className="mt-3">
-        <Button
-          title="Bookmark"
-          onPress={() => handleAddBookmark(item.$id)} // Pass video ID to the function
-        />
-      </View>
     </Animatable.View>
   );
 };
