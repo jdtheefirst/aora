@@ -1,17 +1,14 @@
 import { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import {
-  FlatList,
-  Image,
-  RefreshControl,
-  Text,
-  View,
-  Alert,
-} from "react-native";
+import { FlatList, Image, RefreshControl, Text, View } from "react-native";
 
 import { images } from "../../constants";
 import useAppwrite from "../../lib/useAppwrite";
-import { getAllPosts, getLatestPosts } from "../../lib/appwrite";
+import {
+  getAllPosts,
+  getLatestPosts,
+  handleAddBookmark,
+} from "../../lib/appwrite";
 import { EmptyState, SearchInput, Trending, VideoCard } from "../../components";
 import { useGlobalContext } from "../../context/GlobalProvider";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -30,14 +27,10 @@ const Home = () => {
     setRefreshing(false);
   };
 
-  const handleAddBookmark = async (videoId) => {
-    try {
-      await handleAddBookmark(user?.$id, videoId);
-      Alert.alert("Success", "Bookmark added successfully!");
-    } catch (error) {
-      console.error(error.message);
-      Alert.alert("Error", "Failed to add bookmark.");
-    }
+  const icons = {
+    bookmark: "bookmark",
+    check: "check",
+    plus: "plus",
   };
 
   const isBookmarked = (video) => {
@@ -67,10 +60,10 @@ const Home = () => {
                 borderRadius: 20, // Optional: to make it round
                 padding: 10, // Optional: to add some space around the icon
               }}
-              onPress={() => handleAddBookmark(item.$id)}
+              onPress={() => handleAddBookmark(user?.$id, item.$id)}
             >
               <Icon
-                name={isBookmarked(item) ? "check" : "plus"} // Use 'check' for tick, 'plus' for add
+                name={icons.bookmark} // Use 'check' for tick, 'plus' for add
                 size={20} // Adjust size as needed
                 color={isBookmarked(item) ? "green" : "blue"} // Change color based on state
               />

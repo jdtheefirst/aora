@@ -5,9 +5,11 @@
 ## Enhancements
 
 <ul>
-  <li><strong>Bookmark Tab:</strong> Added functionality for users to save videos directly within the app. Each video now contains a `bookmarks` array that stores the user IDs of users who have saved/bookmarked it, allowing for easy access to saved content.</li>
+  <li><strong>Bookmark Tab:</strong> Added functionality for users to save videos directly within the app. Each video now contains a `bookmarks` array that stores the user IDs of users who have saved/bookmarked it, allowing for easy access to saved content including adding and removing content.</li>
   <li><strong>Appwrite Database Updates:</strong> Enhanced video attributes to include a `bookmarks` field for storing user IDs, facilitating personalized bookmarking capabilities.</li>
 </ul>
+
+![Thumbnail](./assets/images/readme.png)
 
 <p>These enhancements aim to improve both the user experience and the database structure, leveraging Appwrite for efficient data management and accessibility.</p>
 
